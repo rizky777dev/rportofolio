@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   DESIGN TOKENS
+   Semua warna diturunkan dari variabel ini. next-themes hanya menambah/
+   melepas class "dark" di <html> — TIDAK pernah remount komponen, TIDAK
+   pernah reload halaman, sehingga tidak ada flash of unstyled content.
+   ========================================================================== */
+:root {
+  --color-bg: #FAFAF9;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-inset: #F1F0EE;
+  --color-text-primary: #16181D;
+  --color-text-secondary: #565B66;
+  --color-text-muted: #8A8F99;
+  --color-border: #E4E3E0;
+  --color-border-strong: #CFCECA;
+
+  --color-accent: #5B4FE9;
+  --color-accent-soft: #EDEBFC;
+  --color-accent-2: #0EA5A5;
+  --color-danger: #E5484D;
+  --color-accent-rgb: 91, 79, 233;
+
+  --gradient-signature: linear-gradient(135deg, #5B4FE9 0%, #0EA5A5 100%);
+
+  --shadow-sm: 0 1px 2px rgba(22, 24, 29, 0.06);
+  --shadow-md: 0 8px 24px rgba(22, 24, 29, 0.08);
+  --shadow-lg: 0 24px 48px rgba(22, 24, 29, 0.12);
+  --shadow-glow: 0 0 0 1px rgba(var(--color-accent-rgb), 0.15), 0 12px 32px rgba(var(--color-accent-rgb), 0.18);
+
+  --navbar-bg: rgba(250, 250, 249, 0.7);
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* .dark ditambahkan oleh next-themes (attribute="class") pada <html> */
+.dark {
+  --color-bg: #0D0E12;
+  --color-bg-elevated: #15171D;
+  --color-bg-inset: #1A1C23;
+  --color-text-primary: #F2F2F0;
+  --color-text-secondary: #A6ABB6;
+  --color-text-muted: #6B7080;
+  --color-border: #24262E;
+  --color-border-strong: #33353F;
+
+  --color-accent: #8B7FFF;
+  --color-accent-soft: #211E3D;
+  --color-accent-2: #2DD4CF;
+  --color-danger: #F1666B;
+  --color-accent-rgb: 139, 127, 255;
+
+  --gradient-signature: linear-gradient(135deg, #8B7FFF 0%, #2DD4CF 100%);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px rgba(var(--color-accent-rgb), 0.25), 0 12px 40px rgba(var(--color-accent-rgb), 0.28);
+
+  --navbar-bg: rgba(13, 14, 18, 0.65);
+}
+
+/* ==========================================================================
+   ANTI-FLICKER THEME TRANSITION
+   Sebelumnya transition cuma nempel di body + class .theme-transition (yang
+   ternyata tidak dipakai di komponen manapun) -> body fade halus, tapi semua
+   card/border/tombol di dalamnya loncat instan ke warna baru. Hasilnya
+   transisi kelihatan "patah", bukan menyatu.
+   Fix: pasang transition di SEMUA elemen (selector *), tapi HANYA untuk
+   properti warna yang murah buat browser (background-color/border-color/
+   color/box-shadow/fill/stroke -> compositor-friendly, tidak memicu layout).
+   Elemen yang sudah punya transition sendiri (mis. Tailwind "transition-
+   colors duration-300" di navbar/nav-link) otomatis menang lewat CSS
+   specificity (class selector > selector *), jadi tidak bentrok/dobel.
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, box-shadow, fill, stroke;
+  /* 300ms -- durasi standar untuk transisi warna berskala besar (dipakai
+     banyak design system: Material, Apple HIG) -- cukup kerasa sebagai
+     "blend" yang mulus, tapi nggak sampai kerasa lambat/nge-drag. */
+  transition-duration: 0.3s;
+  transition-timing-function: var(--ease-smooth);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Selama page belum ter-hydrate, matikan transisi supaya tidak ada
+   "flash" transisi warna yang salah di first paint. next-themes akan
+   melepas atribut ini otomatis lewat disableTransitionOnChange bila perlu. */
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) var(--color-bg);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   GPU-ACCELERATED ANIMATION HELPERS
+   Dipakai di elemen yang beranimasi lewat Framer Motion/CSS: memastikan
+   browser mempromosikan elemen ke layer compositor sendiri (transform &
+   opacity saja -> tidak pernah memicu reflow/repaint mahal).
+   ========================================================================== */
+.gpu-layer {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.section-inner {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+section {
+  padding-block: 88px;
+  position: relative;
+}
+
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 40px;
+}
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 12px;
+  background: var(--color-accent);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  z-index: 999;
+  transition: transform 0.25s var(--ease-out-expo);
+  transform: translateY(0);
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transform: translateZ(0);
+}
+.btn--primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.btn--full {
+  width: 100%;
+  justify-content: center;
+}
+
+kbd.kbd {
+  font-family: var(--font-mono);
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 0.85em;
+}
